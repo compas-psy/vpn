@@ -6,15 +6,16 @@ with CRLF endings, collapsed onto a single line, or missing the trailing
 -----END----- marker - all of which OpenSSL rejects with the unhelpful
 "error in libcrypto". This rewrites the file into a canonical PEM.
 
-When the secret is not a private key at all, it says what it is instead. Every
-message here is written for a PUBLIC log: it reports shapes, lengths and PEM
-marker lines, never key material.
+When the secret is not a usable private key, it says why. Every message here is
+written for a PUBLIC log: it reports shapes, lengths and PEM marker lines,
+never key material.
 
 Usage: normalize_key.py <key-path>
 """
 
 import base64
 import re
+import struct
 import sys
 
 path = sys.argv[1]
@@ -41,6 +42,45 @@ if "-----BEGIN" not in raw:
             pass
 
 
+def inspect_openssh(blob: bytes) -> None:
+    """Report whether the openssh-key-v1 container is self-consistent."""
+    off = 15  # len(b"openssh-key-v1\x00")
+
+    def field() -> bytes:
+        nonlocal off
+        (size,) = struct.unpack(">I", blob[off : off + 4])
+        off += 4
+        value = blob[off : off + size]
+        off += size
+        return value
+
+    try:
+        cipher = field().decode("ascii", "replace")
+        kdf = field().decode("ascii", "replace")
+        field()  # kdf options
+        (count,) = struct.unpack(">I", blob[off : off + 4])
+        off += 4
+        pub = field()
+        (declared,) = struct.unpack(">I", blob[off : off + 4])
+        off += 4
+    except Exception:  # noqa: BLE001 - a short read is itself the answer
+        print("key: openssh container header is incomplete - the secret is truncated")
+        return
+
+    present = len(blob) - off
+    print(f"key: cipher={cipher}, kdf={kdf}, keys={count}, public blob {len(pub)} bytes")
+    print(f"key: private section declares {declared} bytes, {present} bytes present")
+    if present < declared:
+        missing = declared - present
+        b64_missing = -(-missing // 3) * 4
+        print(f"key: TRUNCATED - {missing} bytes short (~{b64_missing} base64 chars, "
+              f"roughly {-(-b64_missing // 70)} line(s) of the key are missing)")
+    elif cipher != "none":
+        print("key: encrypted with a passphrase - unattended ssh cannot use it")
+    else:
+        print("key: container looks complete")
+
+
 def emit(kind: str, header_lines: list, b64: str) -> None:
     wrapped = "\n".join(b64[i : i + 64] for i in range(0, len(b64), 64))
     out = [f"-----BEGIN {kind}-----"]
@@ -53,12 +93,6 @@ def emit(kind: str, header_lines: list, b64: str) -> None:
         fh.write("\n".join(out) + "\n")
 
 
-def describe(kind: str, b64: str, decoded: bytes) -> None:
-    print(f"key: {kind}, body {len(b64)} b64 chars -> {len(decoded)} bytes")
-    if decoded.startswith(b"openssh-key-v1\x00"):
-        print("key: OpenSSH v1 container recognised")
-
-
 PEM = re.compile(r"-----BEGIN ([A-Z0-9 ]+?)-----(.*?)-----END \1-----", re.S)
 match = PEM.search(raw)
 
@@ -66,8 +100,6 @@ if match:
     kind = match.group(1)
     body = match.group(2)
 else:
-    # No END marker. If the base64 body is intact the marker is all that is
-    # missing, and the key is perfectly usable once it is put back.
     begin = re.search(r"-----BEGIN ([A-Z0-9 ]+?)-----", raw)
     if not begin:
         lines = raw.count("\n") + 1 if raw else 0
@@ -88,12 +120,9 @@ else:
             print(f"key: marker line present -> {line}")
 
     kind = begin.group(1)
-    body = raw[begin.end():]
-    body = re.split(r"-----END", body)[0]
+    body = re.split(r"-----END", raw[begin.end():])[0]
     print(f"key: END marker missing for {kind}, rebuilding it")
 
-# Old-style encrypted PEM keeps "Proc-Type"/"DEK-Info" header lines that must
-# not be folded into the base64 body.
 header_lines = []
 body_lines = []
 for line in body.strip().splitlines():
@@ -113,6 +142,8 @@ except Exception as exc:  # noqa: BLE001 - the message is the diagnosis
     sys.exit(1)
 
 emit(kind, header_lines, b64)
-describe(kind, b64, decoded)
+print(f"key: {kind}, body {len(b64)} b64 chars -> {len(decoded)} bytes")
+if decoded.startswith(b"openssh-key-v1\x00"):
+    inspect_openssh(decoded)
 if any(h.startswith(("Proc-Type", "DEK-Info")) for h in header_lines):
     print("key: PEM headers say it is passphrase-encrypted - unattended ssh cannot use it")
