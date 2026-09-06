@@ -114,13 +114,10 @@ jobs:
           SSHOPTS="-i $HOME/.ssh/vpn_key -p $port -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=20 -o StrictHostKeyChecking=yes -o LogLevel=ERROR"
           # shellcheck disable=SC2086
           ssh $SSHOPTS "$target" 'echo connected'
+          # collect.sh writes the archive to stdout and its diagnostics to stderr
           # shellcheck disable=SC2086
-          ssh $SSHOPTS "$target" 'bash -s' < .github/scripts/collect.sh
-          # shellcheck disable=SC2086
-          ssh $SSHOPTS "$target" 'cat /tmp/vpninfo.tgz' > /tmp/vpninfo.tgz
-          # shellcheck disable=SC2086
-          ssh $SSHOPTS "$target" 'rm -rf /tmp/vpninfo.tgz /tmp/vpninfo.d' || true
-          echo "downloaded bytes: $(stat -c %s /tmp/vpninfo.tgz)"
+          ssh $SSHOPTS "$target" 'bash -s' < .github/scripts/collect.sh > /tmp/vpninfo.tar
+          echo "archive bytes: $(wc -c < /tmp/vpninfo.tar)"
 
       - name: Unpack and sanitise
         env:
@@ -129,8 +126,9 @@ jobs:
           set -euo pipefail
           rm -rf server
           mkdir -p server
-          tar xzf /tmp/vpninfo.tgz -C server
-          rm -f /tmp/vpninfo.tgz
+          tar xzf /tmp/vpninfo.tar -C server 2>/dev/null \
+            || tar xf /tmp/vpninfo.tar -C server
+          rm -f /tmp/vpninfo.tar
           python3 .github/scripts/sanitize.py server
           echo "total files: $(find server -type f | wc -l)"
 
