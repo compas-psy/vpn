@@ -1,0 +1,263 @@
+{
+  "log": {
+    "level": "warn",
+    "timestamp": true
+  },
+  "dns": {
+    "servers": [
+      {
+        "tag": "dns-remote",
+        "address": "https://1.1.1.1/dns-query",
+        "address_resolver": "dns-direct",
+        "detour": "proxy",
+        "strategy": "prefer_ipv4"
+      },
+      {
+        "tag": "dns-direct",
+        "address": "77.88.8.8",
+        "detour": "direct",
+        "strategy": "prefer_ipv4"
+      }
+    ],
+    "rules": [
+      {
+        "domain": ["__SERVER__"],
+        "server": "dns-direct"
+      },
+      {
+        "domain_suffix": [
+          ".ru",
+          ".su",
+          ".рф",
+          ".xn--p1ai",
+          ".moscow",
+          ".tatar",
+          ".дети",
+          ".xn--d1acj3b"
+        ],
+        "server": "dns-direct"
+      },
+      {
+        "rule_set": ["geosite-ru"],
+        "server": "dns-direct"
+      },
+      {
+        "domain_suffix": [
+          "max.ru",
+          "oneme.ru",
+          "ipify.org",
+          "vk.com",
+          "vk.me",
+          "vk.company",
+          "vkvideo.ru",
+          "vk-cdn.net",
+          "vkuser.net",
+          "vkuservideo.net",
+          "vkuseraudio.net",
+          "userapi.com",
+          "mycdn.me",
+          "ok.ru",
+          "odnoklassniki.ru",
+          "mail.ru",
+          "imgsmail.ru",
+          "my.games",
+          "list.ru",
+          "bk.ru",
+          "inbox.ru",
+          "yandex.ru",
+          "yandex.net",
+          "yandex.com",
+          "yandexcloud.net",
+          "yastatic.net",
+          "ya.ru",
+          "yadi.sk",
+          "dzen.ru",
+          "kinopoisk.ru",
+          "sberbank.com",
+          "sbrf.ru",
+          "tinkoff.com",
+          "tbank.ru",
+          "alfabank.com",
+          "vtb.ru",
+          "nspk.ru",
+          "mironline.ru",
+          "cbr.ru",
+          "yoomoney.ru",
+          "ozon.ru",
+          "ozone.ru",
+          "wildberries.ru",
+          "wb.ru",
+          "wbbasket.ru",
+          "avito.ru",
+          "avito.st",
+          "2gis.com",
+          "2gis.ru",
+          "habr.com",
+          "rutube.ru",
+          "kaspersky.com"
+        ],
+        "server": "dns-direct"
+      },
+      {
+        "domain_keyword": [
+          "gosuslugi",
+          "sberbank",
+          "tinkoff",
+          "alfabank",
+          "wildberries",
+          "yandex"
+        ],
+        "server": "dns-direct"
+      }
+    ],
+    "final": "dns-remote",
+    "strategy": "prefer_ipv4",
+    "independent_cache": true
+  },
+  "inbounds": [
+    {
+      "type": "mixed",
+      "tag": "agent-in",
+      "listen": "__LISTEN_ADDR__",
+      "listen_port": 11080,
+      "sniff": true,
+      "sniff_override_destination": false
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "hysteria2",
+      "tag": "proxy",
+      "server": "__SERVER__",
+      "server_port": 443,
+      "password": "__PASSWORD__",
+      "tls": {
+        "enabled": true,
+        "server_name": "__SNI__",
+        "insecure": false,
+        "alpn": ["h3"]
+      }
+    },
+    {
+      "type": "direct",
+      "tag": "direct"
+    }
+  ],
+  "route": {
+    "rules": [
+      {
+        "ip_is_private": true,
+        "outbound": "direct"
+      },
+      {
+        "domain_suffix": [
+          ".ru",
+          ".su",
+          ".рф",
+          ".xn--p1ai",
+          ".moscow",
+          ".tatar",
+          ".дети",
+          ".xn--d1acj3b"
+        ],
+        "outbound": "direct"
+      },
+      {
+        "domain_suffix": [
+          "max.ru",
+          "oneme.ru",
+          "ipify.org",
+          "vk.com",
+          "vk.me",
+          "vk.company",
+          "vkvideo.ru",
+          "vk-cdn.net",
+          "vkuser.net",
+          "vkuservideo.net",
+          "vkuseraudio.net",
+          "userapi.com",
+          "mycdn.me",
+          "ok.ru",
+          "odnoklassniki.ru",
+          "mail.ru",
+          "imgsmail.ru",
+          "my.games",
+          "list.ru",
+          "bk.ru",
+          "inbox.ru",
+          "yandex.ru",
+          "yandex.net",
+          "yandex.com",
+          "yandexcloud.net",
+          "yastatic.net",
+          "ya.ru",
+          "yadi.sk",
+          "dzen.ru",
+          "kinopoisk.ru",
+          "sberbank.com",
+          "sbrf.ru",
+          "tinkoff.com",
+          "tbank.ru",
+          "alfabank.com",
+          "vtb.ru",
+          "nspk.ru",
+          "mironline.ru",
+          "cbr.ru",
+          "yoomoney.ru",
+          "ozon.ru",
+          "ozone.ru",
+          "wildberries.ru",
+          "wb.ru",
+          "wbbasket.ru",
+          "avito.ru",
+          "avito.st",
+          "2gis.com",
+          "2gis.ru",
+          "habr.com",
+          "rutube.ru",
+          "kaspersky.com"
+        ],
+        "outbound": "direct"
+      },
+      {
+        "domain_keyword": [
+          "gosuslugi",
+          "sberbank",
+          "tinkoff",
+          "alfabank",
+          "wildberries",
+          "yandex"
+        ],
+        "outbound": "direct"
+      },
+      {
+        "rule_set": ["geosite-ru"],
+        "outbound": "direct"
+      },
+      {
+        "rule_set": ["geoip-ru"],
+        "outbound": "direct"
+      }
+    ],
+    "rule_set": [
+      {
+        "type": "remote",
+        "tag": "geosite-ru",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/KaringX/karing-ruleset/sing/geo/geosite/category-ru.srs",
+        "download_detour": "proxy",
+        "update_interval": "168h"
+      },
+      {
+        "type": "remote",
+        "tag": "geoip-ru",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/KaringX/karing-ruleset/sing/geo/geoip/ru.srs",
+        "download_detour": "proxy",
+        "update_interval": "168h"
+      }
+    ],
+    "final": "proxy",
+    "auto_detect_interface": true
+  }
+}
