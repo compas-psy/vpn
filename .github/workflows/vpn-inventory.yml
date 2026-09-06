@@ -8,6 +8,12 @@ name: vpn-inventory
 #   * never run ssh with -v: verbose output prints the resolved address, which
 #     secret masking does not catch (the masked secret is "user@host", not the
 #     bare address)
+#
+# Secrets used:
+#   VPN_HOST            user@host, host, or host:port
+#   VPN_SSH_KEY         the PRIVATE key
+#   VPN_SSH_PASSPHRASE  optional, required when the key is encrypted
+#   VPN_KNOWN_HOSTS     ssh-keyscan output for the host
 
 on:
   push:
@@ -34,6 +40,7 @@ jobs:
       - name: Configure SSH
         env:
           VPN_SSH_KEY: ${{ secrets.VPN_SSH_KEY }}
+          VPN_SSH_PASSPHRASE: ${{ secrets.VPN_SSH_PASSPHRASE }}
           VPN_KNOWN_HOSTS: ${{ secrets.VPN_KNOWN_HOSTS }}
         run: |
           set -euo pipefail
@@ -55,15 +62,27 @@ jobs:
           python3 .github/scripts/normalize_key.py ~/.ssh/vpn_key
           chmod 600 ~/.ssh/vpn_key
 
+          # The stored key is passphrase-protected; strip it from the runner's
+          # working copy so ssh can use it without a prompt.
+          if [ -n "${VPN_SSH_PASSPHRASE:-}" ]; then
+            if ssh-keygen -p -P "$VPN_SSH_PASSPHRASE" -N '' -f ~/.ssh/vpn_key >/dev/null 2>&1; then
+              echo "key: unlocked with VPN_SSH_PASSPHRASE"
+            else
+              echo "key: VPN_SSH_PASSPHRASE did not unlock the key"
+            fi
+          fi
+
           printf '%s\n' "$VPN_KNOWN_HOSTS" | tr -d '\r' > ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
           echo "known_hosts entries: $(grep -c . ~/.ssh/known_hosts || true)"
 
           if ssh-keygen -y -P '' -f ~/.ssh/vpn_key > ~/.ssh/vpn_key.pub 2>/dev/null; then
-            echo "key parses, no passphrase; public half: $(awk '{print $1}' ~/.ssh/vpn_key.pub)"
+            echo "key ready: $(awk '{print $1}' ~/.ssh/vpn_key.pub)"
             ssh-keygen -lf ~/.ssh/vpn_key.pub | awk '{print "fingerprint:", $2}'
           else
-            echo "warning: ssh-keygen still cannot read the key unattended"
+            echo "key NOT usable: ssh cannot read it unattended."
+            echo "  If it is passphrase-protected, add the VPN_SSH_PASSPHRASE secret."
+            exit 1
           fi
 
       - name: Collect inventory
