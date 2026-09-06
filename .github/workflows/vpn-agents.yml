@@ -1,0 +1,94 @@
+name: vpn-agents
+
+# Installs per-agent authentication on the VPN server: the auth hook, the
+# hysteria-agent CLI, and the switch of hysteria2 from a shared password to
+# command auth. Idempotent, and the installer restores the previous config if
+# the service does not come back.
+#
+# Day to day you do not need this workflow - issue and revoke credentials over
+# ssh:  ssh root@<host> hysteria-agent add <name>
+#
+# THIS REPOSITORY IS PUBLIC: never print a credential, a host or an address.
+
+on:
+  push:
+    paths:
+      - '.github/workflows/vpn-agents.yml'
+      - '.github/scripts/hysteria-authd.sh'
+      - '.github/scripts/hysteria-agent.sh'
+      - '.github/scripts/install-agent-auth.sh'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vpn-server-write
+  cancel-in-progress: false
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure SSH
+        env:
+          VPN_SSH_KEY: ${{ secrets.VPN_SSH_KEY }}
+          VPN_SSH_PASSPHRASE: ${{ secrets.VPN_SSH_PASSPHRASE }}
+          VPN_KNOWN_HOSTS: ${{ secrets.VPN_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$VPN_SSH_KEY" > ~/.ssh/vpn_key
+          python3 .github/scripts/normalize_key.py ~/.ssh/vpn_key
+          chmod 600 ~/.ssh/vpn_key
+
+          try_unlock() {
+            ssh-keygen -p -P "$2" -N '' -f ~/.ssh/vpn_key >/dev/null 2>&1 \
+              && { echo "key: unlocked ($1)"; return 0; }
+            return 1
+          }
+          if ! ssh-keygen -y -P '' -f ~/.ssh/vpn_key >/dev/null 2>&1; then
+            try_unlock "VPN_SSH_PASSPHRASE" "${VPN_SSH_PASSPHRASE:-}" \
+              || try_unlock 'PowerShell -N bug, double quotes' '""' \
+              || try_unlock 'PowerShell -N bug, single quotes' "''" \
+              || { echo "key is locked and no passphrase worked"; exit 1; }
+          fi
+
+          printf '%s\n' "$VPN_KNOWN_HOSTS" | tr -d '\r' > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Install per-agent auth
+        env:
+          VPN_HOST: ${{ secrets.VPN_HOST }}
+        run: |
+          set -euo pipefail
+          raw="$VPN_HOST"
+          port=22
+          case "$raw" in *:*) port="${raw##*:}"; raw="${raw%:*}" ;; esac
+          case "$raw" in *@*) target="$raw" ;; *) target="root@$raw" ;; esac
+          SSHOPTS="-i $HOME/.ssh/vpn_key -p $port -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=20 -o StrictHostKeyChecking=yes -o LogLevel=ERROR"
+
+          # shellcheck disable=SC2086
+          ssh $SSHOPTS "$target" 'cat > /etc/hysteria/authd.sh' < .github/scripts/hysteria-authd.sh
+          # shellcheck disable=SC2086
+          ssh $SSHOPTS "$target" 'cat > /usr/local/bin/hysteria-agent' < .github/scripts/hysteria-agent.sh
+          # shellcheck disable=SC2086
+          ssh $SSHOPTS "$target" 'chmod 750 /etc/hysteria/authd.sh && chmod 755 /usr/local/bin/hysteria-agent'
+          # shellcheck disable=SC2086
+          ssh $SSHOPTS "$target" 'bash -s' < .github/scripts/install-agent-auth.sh
+
+      - name: Show registered agents
+        env:
+          VPN_HOST: ${{ secrets.VPN_HOST }}
+        run: |
+          set -euo pipefail
+          raw="$VPN_HOST"
+          port=22
+          case "$raw" in *:*) port="${raw##*:}"; raw="${raw%:*}" ;; esac
+          case "$raw" in *@*) target="$raw" ;; *) target="root@$raw" ;; esac
+          SSHOPTS="-i $HOME/.ssh/vpn_key -p $port -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=20 -o StrictHostKeyChecking=yes -o LogLevel=ERROR"
+          # names and states only - hysteria-agent list never prints tokens
+          # shellcheck disable=SC2086
+          ssh $SSHOPTS "$target" 'hysteria-agent list; hysteria-agent legacy status'
