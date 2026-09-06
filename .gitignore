@@ -1,0 +1,12 @@
+# Никогда не коммитим сюда рабочие креды: репозиторий публичный.
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+.env
+.env.*
+!.env.example
+secrets/
+*-real.json
+*-filled.json
