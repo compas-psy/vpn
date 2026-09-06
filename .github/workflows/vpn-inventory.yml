@@ -62,14 +62,26 @@ jobs:
           python3 .github/scripts/normalize_key.py ~/.ssh/vpn_key
           chmod 600 ~/.ssh/vpn_key
 
-          # The stored key is passphrase-protected; strip it from the runner's
-          # working copy so ssh can use it without a prompt.
-          if [ -n "${VPN_SSH_PASSPHRASE:-}" ]; then
-            if ssh-keygen -p -P "$VPN_SSH_PASSPHRASE" -N '' -f ~/.ssh/vpn_key >/dev/null 2>&1; then
-              echo "key: unlocked with VPN_SSH_PASSPHRASE"
-            else
-              echo "key: VPN_SSH_PASSPHRASE did not unlock the key"
+          # Strip the passphrase from the runner's working copy. Besides the
+          # real one, try the two-character quote pairs: `ssh-keygen -N ''`
+          # under Windows PowerShell passes the empty string to the native
+          # binary as `""`, so keys meant to be unprotected are encrypted with
+          # that literal text as their passphrase.
+          try_unlock() {
+            if ssh-keygen -p -P "$2" -N '' -f ~/.ssh/vpn_key >/dev/null 2>&1; then
+              echo "key: unlocked ($1)"
+              return 0
             fi
+            return 1
+          }
+
+          if ssh-keygen -y -P '' -f ~/.ssh/vpn_key >/dev/null 2>&1; then
+            echo "key: not encrypted"
+          else
+            try_unlock "VPN_SSH_PASSPHRASE" "${VPN_SSH_PASSPHRASE:-}" \
+              || try_unlock 'literal double-quote pair, PowerShell -N bug' '""' \
+              || try_unlock 'literal single-quote pair, PowerShell -N bug' "''" \
+              || echo "key: still locked"
           fi
 
           printf '%s\n' "$VPN_KNOWN_HOSTS" | tr -d '\r' > ~/.ssh/known_hosts
