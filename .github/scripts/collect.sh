@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
-# Read-only inventory of the VPN server. Writes /tmp/vpninfo.tgz on the server.
+# Read-only inventory of the VPN server.
+#
+# The tar archive goes to STDOUT so that one ssh session both builds and
+# delivers it - a second session may not see the same /tmp. Everything else
+# must go to STDERR; anything printed on stdout corrupts the archive.
 set -uo pipefail
 
-OUT=/tmp/vpninfo.d
-rm -rf "$OUT"; mkdir -p "$OUT/files"
+OUT=$(mktemp -d /tmp/vpninfo.XXXXXX) || OUT=/tmp/vpninfo.d
+rm -rf "${OUT:?}"/* 2>/dev/null
+mkdir -p "$OUT/files"
 
 sect() { echo; echo "########## $* ##########"; }
 
@@ -28,7 +33,7 @@ sect() { echo; echo "########## $* ##########"; }
   sect ufw;              ufw status verbose 2>/dev/null
   sect cron;             crontab -l 2>/dev/null; ls -la /etc/cron.d 2>/dev/null
   sect binaries
-  for b in hysteria hysteria2 mieru mita sing-box xray v2ray trojan-go naive caddy nginx; do
+  for b in hysteria hysteria2 mieru mita sing-box xray v2ray trojan-go naive caddy nginx tar gzip; do
     command -v "$b" >/dev/null 2>&1 && { echo "-- $b -> $(command -v "$b")"; "$b" version 2>&1 | head -5; }
   done
   sect compose-files
@@ -91,5 +96,13 @@ for d in /opt /srv /root /etc/hysteria /etc/hysteria2 /etc/mieru /etc/mita /etc/
   collect_dir "$d"
 done
 
-tar czf /tmp/vpninfo.tgz -C "$OUT" . 2>/dev/null
-echo "COLLECT_OK bytes=$(stat -c %s /tmp/vpninfo.tgz 2>/dev/null) files=$(find "$OUT" -type f | wc -l)"
+echo "COLLECT_OK files=$(find "$OUT" -type f | wc -l) dir=$OUT" >&2
+
+if command -v gzip >/dev/null 2>&1; then
+  tar czf - -C "$OUT" . 2>/dev/null
+else
+  echo "COLLECT_NOTE gzip missing, sending an uncompressed tar" >&2
+  tar cf - -C "$OUT" . 2>/dev/null
+fi
+
+rm -rf "${OUT:?}"
