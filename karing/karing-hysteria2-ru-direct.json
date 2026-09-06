@@ -53,6 +53,7 @@
         "domain_suffix": [
           "max.ru",
           "oneme.ru",
+          "ipify.org",
           "vk.com",
           "vk.me",
           "vk.company",
@@ -212,6 +213,14 @@
         "outbound": "direct"
       },
       {
+        "process_name": ["MAX.exe", "max.exe", "Max.exe", "MAX", "max"],
+        "outbound": "direct"
+      },
+      {
+        "package_name": ["ru.oneme.app"],
+        "outbound": "direct"
+      },
+      {
         "domain_suffix": [
           ".ru",
           ".su",
@@ -228,6 +237,7 @@
         "domain_suffix": [
           "max.ru",
           "oneme.ru",
+          "ipify.org",
           "vk.com",
           "vk.me",
           "vk.company",
