@@ -16,7 +16,7 @@
         "tag": "dns-direct",
         "address": "77.88.8.8",
         "detour": "direct",
-        "strategy": "ipv4_only"
+        "strategy": "prefer_ipv4"
       }
     ],
     "rules": [
@@ -167,8 +167,7 @@
       "strict_route": true,
       "stack": "mixed",
       "sniff": true,
-      "sniff_override_destination": false,
-      "domain_strategy": "prefer_ipv4"
+      "sniff_override_destination": false
     }
   ],
   "outbounds": [
@@ -365,11 +364,5 @@
     ],
     "final": "proxy",
     "auto_detect_interface": true
-  },
-  "experimental": {
-    "cache_file": {
-      "enabled": true,
-      "path": "cache.db"
-    }
   }
 }
