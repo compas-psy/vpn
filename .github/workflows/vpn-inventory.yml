@@ -34,13 +34,65 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p ~/.ssh && chmod 700 ~/.ssh
-          printf '%s\n' "$VPN_SSH_KEY" > ~/.ssh/vpn_key
+
+          printf '%s\n' "$VPN_SSH_KEY" | tr -d '\r' > ~/.ssh/vpn_key
+
+          # A secret stored as base64 is still a usable key - unwrap it.
+          if ! grep -q -- '-----BEGIN' ~/.ssh/vpn_key; then
+            if base64 -d < ~/.ssh/vpn_key > ~/.ssh/vpn_key.dec 2>/dev/null \
+               && grep -q -- '-----BEGIN' ~/.ssh/vpn_key.dec; then
+              mv ~/.ssh/vpn_key.dec ~/.ssh/vpn_key
+              echo "note: key was base64-encoded, decoded it"
+            else
+              rm -f ~/.ssh/vpn_key.dec
+            fi
+          fi
+
+          # A key pasted as one long line parses only after the body is reflowed.
+          python3 - <<'PY'
+          import os, re
+          p = os.path.expanduser("~/.ssh/vpn_key")
+          raw = open(p).read().strip()
+          if raw.count("\n") < 3:
+              m = re.match(r"-----BEGIN ([A-Z0-9 ]+)-----(.*?)-----END \1-----", raw, re.S)
+              if m:
+                  kind = m.group(1)
+                  body = re.sub(r"\s+", "", m.group(2))
+                  wrapped = "\n".join(body[i:i + 70] for i in range(0, len(body), 70))
+                  open(p, "w").write(f"-----BEGIN {kind}-----\n{wrapped}\n-----END {kind}-----\n")
+                  print("note: key was on a single line, reflowed it")
+          PY
+
+          # exactly one trailing newline
+          printf '%s\n' "$(cat ~/.ssh/vpn_key)" > ~/.ssh/vpn_key.tmp
+          mv ~/.ssh/vpn_key.tmp ~/.ssh/vpn_key
           chmod 600 ~/.ssh/vpn_key
-          printf '%s\n' "$VPN_KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+          printf '%s\n' "$VPN_KNOWN_HOSTS" | tr -d '\r' > ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
-          ssh-keygen -lf ~/.ssh/vpn_key >/dev/null 2>&1 \
-            && echo "ssh key loaded" \
-            || { echo "VPN_SSH_KEY is not a valid private key"; exit 1; }
+
+          if grep -q 'BEGIN OPENSSH PRIVATE KEY' ~/.ssh/vpn_key; then
+            echo "key format: openssh"
+          elif grep -q 'BEGIN RSA PRIVATE KEY' ~/.ssh/vpn_key; then
+            echo "key format: pem/rsa"
+          elif grep -q 'BEGIN EC PRIVATE KEY' ~/.ssh/vpn_key; then
+            echo "key format: pem/ec"
+          elif grep -q 'BEGIN PRIVATE KEY' ~/.ssh/vpn_key; then
+            echo "key format: pkcs8"
+          elif grep -q 'ssh-\(rsa\|ed25519\)' ~/.ssh/vpn_key; then
+            echo "key format: THIS IS A PUBLIC KEY, not a private one"
+          else
+            echo "key format: unrecognised"
+          fi
+          echo "key lines: $(wc -l < ~/.ssh/vpn_key)"
+          echo "known_hosts entries: $(grep -c . ~/.ssh/known_hosts || true)"
+
+          if ssh-keygen -y -P '' -f ~/.ssh/vpn_key >/dev/null 2>&1; then
+            echo "key parses, no passphrase"
+          else
+            echo "warning: ssh-keygen cannot read the key unattended"
+            echo "         (encrypted with a passphrase, or malformed)"
+          fi
 
       - name: Collect inventory
         env:
@@ -56,7 +108,14 @@ jobs:
             *@*) target="$raw" ;;
             *)   target="root@$raw" ;;
           esac
-          SSHOPTS="-i $HOME/.ssh/vpn_key -p $port -o BatchMode=yes -o ConnectTimeout=20 -o StrictHostKeyChecking=yes"
+          SSHOPTS="-i $HOME/.ssh/vpn_key -p $port -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=20 -o StrictHostKeyChecking=yes"
+          # shellcheck disable=SC2086
+          if ! ssh $SSHOPTS "$target" 'echo connected' ; then
+            echo "----- ssh failed, verbose retry -----"
+            # shellcheck disable=SC2086
+            ssh -v $SSHOPTS "$target" 'echo connected' || true
+            exit 1
+          fi
           # shellcheck disable=SC2086
           ssh $SSHOPTS "$target" 'bash -s' < .github/scripts/collect.sh
           # shellcheck disable=SC2086
