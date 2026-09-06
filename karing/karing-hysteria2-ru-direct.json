@@ -1,0 +1,365 @@
+{
+  "log": {
+    "level": "warn",
+    "timestamp": true
+  },
+  "dns": {
+    "servers": [
+      {
+        "tag": "dns-remote",
+        "address": "https://1.1.1.1/dns-query",
+        "address_resolver": "dns-direct",
+        "detour": "proxy",
+        "strategy": "prefer_ipv4"
+      },
+      {
+        "tag": "dns-direct",
+        "address": "77.88.8.8",
+        "detour": "direct",
+        "strategy": "ipv4_only"
+      }
+    ],
+    "rules": [
+      {
+        "domain": ["__SERVER__"],
+        "server": "dns-direct"
+      },
+      {
+        "clash_mode": "Direct",
+        "server": "dns-direct"
+      },
+      {
+        "clash_mode": "Global",
+        "server": "dns-remote"
+      },
+      {
+        "domain_suffix": [
+          ".ru",
+          ".su",
+          ".рф",
+          ".xn--p1ai",
+          ".moscow",
+          ".tatar",
+          ".дети",
+          ".xn--d1acj3b"
+        ],
+        "server": "dns-direct"
+      },
+      {
+        "rule_set": ["geosite-ru"],
+        "server": "dns-direct"
+      },
+      {
+        "domain_suffix": [
+          "max.ru",
+          "oneme.ru",
+          "vk.com",
+          "vk.me",
+          "vk.company",
+          "vkvideo.ru",
+          "vk-cdn.net",
+          "vk-portal.net",
+          "vkuser.net",
+          "vkuservideo.net",
+          "vkuseraudio.net",
+          "vkuserlive.net",
+          "userapi.com",
+          "mycdn.me",
+          "ok.ru",
+          "odnoklassniki.ru",
+          "mail.ru",
+          "imgsmail.ru",
+          "mradx.net",
+          "my.games",
+          "list.ru",
+          "bk.ru",
+          "inbox.ru",
+          "yandex.ru",
+          "yandex.net",
+          "yandex.com",
+          "yandex.com.tr",
+          "yandex.eu",
+          "yandexcloud.net",
+          "yastatic.net",
+          "yastat.net",
+          "ya.ru",
+          "ya.cc",
+          "yadi.sk",
+          "dzen.ru",
+          "kinopoisk.ru",
+          "kinopoisk.cloud",
+          "sberbank.com",
+          "sberdevices.ru",
+          "sbrf.ru",
+          "tinkoff.com",
+          "tbank.ru",
+          "alfabank.com",
+          "alfabank.st",
+          "raiffeisen.ru",
+          "gazprombank.ru",
+          "vtb.ru",
+          "psbank.ru",
+          "rshb.ru",
+          "sovcombank.ru",
+          "rosbank.ru",
+          "open.ru",
+          "mkb.ru",
+          "uralsib.ru",
+          "homecredit.ru",
+          "nspk.ru",
+          "mironline.ru",
+          "cbr.ru",
+          "yoomoney.ru",
+          "qiwi.com",
+          "ozon.ru",
+          "ozone.ru",
+          "ozon.com",
+          "wildberries.ru",
+          "wb.ru",
+          "wbbasket.ru",
+          "avito.ru",
+          "avito.st",
+          "aliexpress.ru",
+          "2gis.com",
+          "2gis.ru",
+          "habr.com",
+          "rutube.ru",
+          "premier.one",
+          "okko.tv",
+          "more.tv",
+          "start.ru",
+          "wink.ru",
+          "kion.ru",
+          "ivi.ru",
+          "sberdisk.ru",
+          "cdnvideo.ru",
+          "ngenix.net",
+          "kaspersky.com",
+          "kaspersky-labs.com",
+          "drweb.com"
+        ],
+        "server": "dns-direct"
+      },
+      {
+        "domain_keyword": [
+          "gosuslugi",
+          "sberbank",
+          "tinkoff",
+          "alfabank",
+          "wildberries",
+          "yandex"
+        ],
+        "server": "dns-direct"
+      }
+    ],
+    "final": "dns-remote",
+    "strategy": "prefer_ipv4",
+    "independent_cache": true
+  },
+  "inbounds": [
+    {
+      "type": "tun",
+      "tag": "tun-in",
+      "address": ["172.19.0.1/30", "fdfe:dcba:9876::1/126"],
+      "mtu": 9000,
+      "auto_route": true,
+      "strict_route": true,
+      "stack": "mixed",
+      "sniff": true,
+      "sniff_override_destination": false,
+      "domain_strategy": "prefer_ipv4"
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "hysteria2",
+      "tag": "proxy",
+      "server": "__SERVER__",
+      "server_port": 443,
+      "password": "__PASSWORD__",
+      "tls": {
+        "enabled": true,
+        "server_name": "__SNI__",
+        "insecure": false,
+        "alpn": ["h3"]
+      }
+    },
+    {
+      "type": "direct",
+      "tag": "direct"
+    }
+  ],
+  "route": {
+    "rules": [
+      {
+        "action": "hijack-dns",
+        "protocol": "dns"
+      },
+      {
+        "action": "hijack-dns",
+        "port": 53
+      },
+      {
+        "clash_mode": "Direct",
+        "outbound": "direct"
+      },
+      {
+        "clash_mode": "Global",
+        "outbound": "proxy"
+      },
+      {
+        "ip_is_private": true,
+        "outbound": "direct"
+      },
+      {
+        "domain_suffix": [
+          ".ru",
+          ".su",
+          ".рф",
+          ".xn--p1ai",
+          ".moscow",
+          ".tatar",
+          ".дети",
+          ".xn--d1acj3b"
+        ],
+        "outbound": "direct"
+      },
+      {
+        "domain_suffix": [
+          "max.ru",
+          "oneme.ru",
+          "vk.com",
+          "vk.me",
+          "vk.company",
+          "vkvideo.ru",
+          "vk-cdn.net",
+          "vk-portal.net",
+          "vkuser.net",
+          "vkuservideo.net",
+          "vkuseraudio.net",
+          "vkuserlive.net",
+          "userapi.com",
+          "mycdn.me",
+          "ok.ru",
+          "odnoklassniki.ru",
+          "mail.ru",
+          "imgsmail.ru",
+          "mradx.net",
+          "my.games",
+          "list.ru",
+          "bk.ru",
+          "inbox.ru",
+          "yandex.ru",
+          "yandex.net",
+          "yandex.com",
+          "yandex.com.tr",
+          "yandex.eu",
+          "yandexcloud.net",
+          "yastatic.net",
+          "yastat.net",
+          "ya.ru",
+          "ya.cc",
+          "yadi.sk",
+          "dzen.ru",
+          "kinopoisk.ru",
+          "kinopoisk.cloud",
+          "sberbank.com",
+          "sberdevices.ru",
+          "sbrf.ru",
+          "tinkoff.com",
+          "tbank.ru",
+          "alfabank.com",
+          "alfabank.st",
+          "raiffeisen.ru",
+          "gazprombank.ru",
+          "vtb.ru",
+          "psbank.ru",
+          "rshb.ru",
+          "sovcombank.ru",
+          "rosbank.ru",
+          "open.ru",
+          "mkb.ru",
+          "uralsib.ru",
+          "homecredit.ru",
+          "nspk.ru",
+          "mironline.ru",
+          "cbr.ru",
+          "yoomoney.ru",
+          "qiwi.com",
+          "ozon.ru",
+          "ozone.ru",
+          "ozon.com",
+          "wildberries.ru",
+          "wb.ru",
+          "wbbasket.ru",
+          "avito.ru",
+          "avito.st",
+          "aliexpress.ru",
+          "2gis.com",
+          "2gis.ru",
+          "habr.com",
+          "rutube.ru",
+          "premier.one",
+          "okko.tv",
+          "more.tv",
+          "start.ru",
+          "wink.ru",
+          "kion.ru",
+          "ivi.ru",
+          "sberdisk.ru",
+          "cdnvideo.ru",
+          "ngenix.net",
+          "kaspersky.com",
+          "kaspersky-labs.com",
+          "drweb.com"
+        ],
+        "outbound": "direct"
+      },
+      {
+        "domain_keyword": [
+          "gosuslugi",
+          "sberbank",
+          "tinkoff",
+          "alfabank",
+          "wildberries",
+          "yandex"
+        ],
+        "outbound": "direct"
+      },
+      {
+        "rule_set": ["geosite-ru"],
+        "outbound": "direct"
+      },
+      {
+        "rule_set": ["geoip-ru"],
+        "outbound": "direct"
+      }
+    ],
+    "rule_set": [
+      {
+        "type": "remote",
+        "tag": "geosite-ru",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/KaringX/karing-ruleset/sing/geo/geosite/category-ru.srs",
+        "download_detour": "proxy",
+        "update_interval": "168h"
+      },
+      {
+        "type": "remote",
+        "tag": "geoip-ru",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/KaringX/karing-ruleset/sing/geo/geoip/ru.srs",
+        "download_detour": "proxy",
+        "update_interval": "168h"
+      }
+    ],
+    "final": "proxy",
+    "auto_detect_interface": true
+  },
+  "experimental": {
+    "cache_file": {
+      "enabled": true,
+      "path": "cache.db"
+    }
+  }
+}
