@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Read-only inventory of the VPN server.
 #
-# The tar archive goes to STDOUT so that one ssh session both builds and
-# delivers it - a second session may not see the same /tmp. Everything else
-# must go to STDERR; anything printed on stdout corrupts the archive.
+# The archive is written to STDOUT as base64 between -----BEGIN VPNINFO-----
+# and -----END VPNINFO----- markers. The login shell shares this stdout and
+# may prepend a banner, so the caller slices out the marked block rather than
+# trusting the stream to be clean. Diagnostics go to STDERR.
 set -uo pipefail
 
 OUT=$(mktemp -d /tmp/vpninfo.XXXXXX) || OUT=/tmp/vpninfo.d
@@ -96,13 +97,15 @@ for d in /opt /srv /root /etc/hysteria /etc/hysteria2 /etc/mieru /etc/mita /etc/
   collect_dir "$d"
 done
 
-echo "COLLECT_OK files=$(find "$OUT" -type f | wc -l) dir=$OUT" >&2
+echo "COLLECT_OK files=$(find "$OUT" -type f | wc -l)" >&2
 
+echo "-----BEGIN VPNINFO-----"
 if command -v gzip >/dev/null 2>&1; then
-  tar czf - -C "$OUT" . 2>/dev/null
+  tar czf - -C "$OUT" . 2>/dev/null | base64
 else
   echo "COLLECT_NOTE gzip missing, sending an uncompressed tar" >&2
-  tar cf - -C "$OUT" . 2>/dev/null
+  tar cf - -C "$OUT" . 2>/dev/null | base64
 fi
+echo "-----END VPNINFO-----"
 
 rm -rf "${OUT:?}"
