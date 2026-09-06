@@ -1,0 +1,621 @@
+
+########## uname ##########
+Linux <domain-1> 4.18.0-553.123.1.el8_10.x86_64 #1 SMP Tue May 5 04:00:43 EDT 2026 x86_64 x86_64 x86_64 GNU/Linux
+
+########## os-release ##########
+NAME="AlmaLinux"
+VERSION="8.10 (Cerulean Leopard)"
+ID="almalinux"
+ID_LIKE="rhel centos fedora"
+VERSION_ID="8.10"
+PLATFORM_ID="platform:el8"
+PRETTY_NAME="AlmaLinux 8.10 (Cerulean Leopard)"
+ANSI_COLOR="0;34"
+LOGO="fedora-logo-icon"
+CPE_NAME="cpe:/o:almalinux:almalinux:8::baseos"
+HOME_URL="https://<domain-2>/"
+DOCUMENTATION_URL="https://<domain-3>/"
+BUG_REPORT_URL="https://<domain-4>/"
+
+ALMALINUX_MANTISBT_PROJECT="AlmaLinux-8"
+ALMALINUX_MANTISBT_PROJECT_VERSION="8.10"
+REDHAT_SUPPORT_PRODUCT="AlmaLinux"
+REDHAT_SUPPORT_PRODUCT_VERSION="8.10"
+SUPPORT_END=2029-06-01
+
+########## uptime ##########
+ 10:50:01 up 88 days, 20:30,  0 users,  load average: 0.14, 0.14, 0.10
+
+########## date ##########
+Sun Sep  6 10:50:01 UTC 2026
+
+########## id ##########
+uid=0(root) gid=0(root) groups=0(root)
+
+########## disk ##########
+Filesystem      Size  Used Avail Use% Mounted on
+devtmpfs        873M     0  873M   0% /dev
+tmpfs           890M     0  890M   0% /dev/shm
+tmpfs           890M   89M  801M  10% /run
+tmpfs           890M     0  890M   0% /sys/fs/cgroup
+/dev/vda2        25G  3.8G   20G  17% /
+tmpfs           178M     0  178M   0% /run/user/0
+
+########## listening-ports ##########
+Netid State  Recv-Q Send-Q Local Address:Port  Peer Address:PortProcess                              
+udp   UNCONN 0      0          127.0.0.1:323        0.0.0.0:*    users:(("chronyd",pid=581,fd=5))    
+udp   UNCONN 0      0                  *:44711            *:*    users:(("hysteria",pid=25195,fd=31))
+udp   UNCONN 0      0                  *:36712            *:*    users:(("hysteria",pid=25195,fd=3)) 
+udp   UNCONN 0      0                  *:2012             *:*    users:(("mita",pid=24459,fd=20))    
+udp   UNCONN 0      0                  *:2013             *:*    users:(("mita",pid=24459,fd=21))    
+udp   UNCONN 0      0                  *:2014             *:*    users:(("mita",pid=24459,fd=22))    
+udp   UNCONN 214528 0                  *:2015             *:*    users:(("mita",pid=24459,fd=23))    
+udp   UNCONN 0      0                  *:2016             *:*    users:(("mita",pid=24459,fd=24))    
+udp   UNCONN 0      0                  *:2017             *:*    users:(("mita",pid=24459,fd=25))    
+udp   UNCONN 0      0                  *:2018             *:*    users:(("mita",pid=24459,fd=26))    
+udp   UNCONN 0      0                  *:2019             *:*    users:(("mita",pid=24459,fd=27))    
+udp   UNCONN 0      0                  *:2020             *:*    users:(("mita",pid=24459,fd=28))    
+udp   UNCONN 0      0                  *:2021             *:*    users:(("mita",pid=24459,fd=29))    
+udp   UNCONN 0      0                  *:2022             *:*    users:(("mita",pid=24459,fd=8))     
+udp   UNCONN 0      0                  *:45098            *:*    users:(("hysteria",pid=25195,fd=22))
+udp   UNCONN 0      0              [::1]:323           [::]:*    users:(("chronyd",pid=581,fd=6))    
+tcp   LISTEN 0      128          0.0.0.0:22         0.0.0.0:*    users:(("sshd",pid=612,fd=3))       
+tcp   LISTEN 0      2048               *:2012             *:*    users:(("mita",pid=24459,fd=9))     
+tcp   LISTEN 0      2048               *:2013             *:*    users:(("mita",pid=24459,fd=10))    
+tcp   LISTEN 0      2048               *:2014             *:*    users:(("mita",pid=24459,fd=11))    
+tcp   LISTEN 0      2048               *:2015             *:*    users:(("mita",pid=24459,fd=12))    
+tcp   LISTEN 0      2048               *:2016             *:*    users:(("mita",pid=24459,fd=13))    
+tcp   LISTEN 0      2048               *:2017             *:*    users:(("mita",pid=24459,fd=14))    
+tcp   LISTEN 0      2048               *:2018             *:*    users:(("mita",pid=24459,fd=15))    
+tcp   LISTEN 0      2048               *:2019             *:*    users:(("mita",pid=24459,fd=16))    
+tcp   LISTEN 0      2048               *:2020             *:*    users:(("mita",pid=24459,fd=17))    
+tcp   LISTEN 0      2048               *:2021             *:*    users:(("mita",pid=24459,fd=18))    
+tcp   LISTEN 0      2048               *:2022             *:*    users:(("mita",pid=24459,fd=19))    
+tcp   LISTEN 0      128             [::]:22            [::]:*    users:(("sshd",pid=612,fd=4))       
+
+########## processes ##########
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root           1  0.0  0.5 172740 10748 ?        Ss   Jun09   4:15 /usr/lib/systemd/systemd --switched-root --system --deserialize 17
+root           2  0.0  0.0      0     0 ?        S    Jun09   0:00 [kthreadd]
+root           3  0.0  0.0      0     0 ?        I<   Jun09   0:00 [rcu_gp]
+root           4  0.0  0.0      0     0 ?        I<   Jun09   0:00 [rcu_par_gp]
+root           5  0.0  0.0      0     0 ?        I<   Jun09   0:00 [slub_flushwq]
+root           7  0.0  0.0      0     0 ?        I<   Jun09   0:00 [kworker/0:0H-events_highpri]
+root           9  0.0  0.0      0     0 ?        I    Jun09   1:05 [kworker/u2:0-events_unbound]
+root          10  0.0  0.0      0     0 ?        I<   Jun09   0:00 [mm_percpu_wq]
+root          11  0.0  0.0      0     0 ?        S    Jun09   0:00 [rcu_tasks_rude_]
+root          12  0.0  0.0      0     0 ?        S    Jun09   0:00 [rcu_tasks_trace]
+root          13  0.0  0.0      0     0 ?        S    Jun09   1:55 [ksoftirqd/0]
+root          14  0.0  0.0      0     0 ?        R    Jun09   3:25 [rcu_sched]
+root          15  0.0  0.0      0     0 ?        S    Jun09   0:00 [migration/0]
+root          16  0.0  0.0      0     0 ?        S    Jun09   0:04 [watchdog/0]
+root          17  0.0  0.0      0     0 ?        S    Jun09   0:00 [cpuhp/0]
+root          19  0.0  0.0      0     0 ?        S    Jun09   0:00 [kdevtmpfs]
+root          20  0.0  0.0      0     0 ?        I<   Jun09   0:00 [netns]
+root          21  0.0  0.0      0     0 ?        S    Jun09   0:34 [kauditd]
+root          22  0.0  0.0      0     0 ?        S    Jun09   0:01 [khungtaskd]
+root          23  0.0  0.0      0     0 ?        S    Jun09   0:00 [oom_reaper]
+root          24  0.0  0.0      0     0 ?        I<   Jun09   0:00 [writeback]
+root          25  0.0  0.0      0     0 ?        S    Jun09   0:00 [kcompactd0]
+root          26  0.0  0.0      0     0 ?        SN   Jun09   0:00 [ksmd]
+root          27  0.0  0.0      0     0 ?        SN   Jun09   2:50 [khugepaged]
+root          28  0.0  0.0      0     0 ?        I<   Jun09   0:00 [crypto]
+root          29  0.0  0.0      0     0 ?        I<   Jun09   0:00 [kintegrityd]
+root          30  0.0  0.0      0     0 ?        I<   Jun09   0:00 [kblockd]
+root          31  0.0  0.0      0     0 ?        I<   Jun09   0:00 [blkcg_punt_bio]
+root          32  0.0  0.0      0     0 ?        I<   Jun09   0:00 [tpm_dev_wq]
+root          33  0.0  0.0      0     0 ?        I<   Jun09   0:00 [md]
+root          34  0.0  0.0      0     0 ?        I<   Jun09   0:00 [md_bitmap]
+root          35  0.0  0.0      0     0 ?        I<   Jun09   0:00 [edac-poller]
+root          36  0.0  0.0      0     0 ?        S    Jun09   0:00 [watchdogd]
+root          37  0.0  0.0      0     0 ?        I<   Jun09   0:34 [kworker/0:1H-kblockd]
+root          57  0.0  0.0      0     0 ?        S    Jun09   0:02 [kswapd0]
+root         118  0.0  0.0      0     0 ?        I<   Jun09   0:00 [kthrotld]
+root         119  0.0  0.0      0     0 ?        I<   Jun09   0:00 [acpi_thermal_pm]
+root         120  0.0  0.0      0     0 ?        S    Jun09   0:00 [hwrng]
+root         121  0.0  0.0      0     0 ?        I<   Jun09   0:00 [kmpath_rdacd]
+root         122  0.0  0.0      0     0 ?        I<   Jun09   0:00 [kaluad]
+root         124  0.0  0.0      0     0 ?        I<   Jun09   0:00 [ipv6_addrconf]
+root         125  0.0  0.0      0     0 ?        I<   Jun09   0:00 [kstrp]
+root         164  0.0  0.0      0     0 ?        I<   Jun09   0:00 [zswap-shrink]
+root         332  0.0  0.0      0     0 ?        I<   Jun09   0:00 [ata_sff]
+root         333  0.0  0.0      0     0 ?        S    Jun09   0:00 [scsi_eh_0]
+root         334  0.0  0.0      0     0 ?        I<   Jun09   0:00 [scsi_tmf_0]
+root         336  0.0  0.0      0     0 ?        S    Jun09   0:00 [scsi_eh_1]
+root         337  0.0  0.0      0     0 ?        I<   Jun09   0:00 [scsi_tmf_1]
+root         340  0.0  0.0      0     0 ?        I    Jun09   0:15 [kworker/u2:3-events_unbound]
+root         356  0.0  0.0      0     0 ?        S    Jun09   1:57 [jbd2/vda2-8]
+root         357  0.0  0.0      0     0 ?        I<   Jun09   0:00 [ext4-rsv-conver]
+root         446  0.0  1.8 131496 34556 ?        Ss   Jun09  22:01 /usr/lib/systemd/systemd-journald
+root         475  0.0  0.4  95352  7836 ?        Ss   Jun09   0:11 /usr/lib/systemd/systemd-udevd
+root         508  0.0  0.1  57180  2300 ?        S<sl Jun09   6:00 /sbin/auditd
+root         554  0.0  0.4  81672  7520 ?        Ss   Jun09   0:10 /usr/lib/systemd/systemd-logind
+dbus         555  0.0  0.3  60196  5612 ?        Ss   Jun09   6:28 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+root         566  0.0  0.3 135484  6988 ?        Ssl  Jun09  52:57 /usr/bin/qemu-ga --method=virtio-serial --path=/dev/virtio-ports/<domain-5>.guest_agent.0 --blacklist= -F/etc/qemu-ga/fsfreeze-hook
+chrony       581  0.0  0.2 140184  4480 ?        S    Jun09   0:07 /usr/sbin/chronyd
+root         601  0.0  0.9 590700 17128 ?        Ssl  Jun09   2:22 /usr/sbin/NetworkManager --no-daemon
+root         610  0.1  1.3 620268 24568 ?        Ssl  Jun09 143:19 /usr/libexec/platform-python -Es /usr/sbin/tuned -l -P
+root         612  0.0  0.3  76732  6788 ?        Ss   Jun09   6:41 /usr/sbin/sshd -D -oCiphers=<email>,<email>,aes256-ctr,aes256-cbc,<email>,aes128-ctr,aes128-cbc -oMACs=<email>,<email>,<email>,<email>,hmac-sha2-256,hmac-sha1,<email>,hmac-sha2-512 -oGSSAPIKexAlgorithms=gss-curve25519-sha256-,gss-nistp256-sha256-,gss-group14-sha256-,gss-group16-sha512-,gss-gex-sha1-,gss-group14-sha1- -<redacted-token>-sha256,<email>,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1 -oHostKeyAlgorithms=ecdsa-sha2-nistp256,<email>,ecdsa-sha2-nistp384,<email>,ecdsa-sha2-nistp521,<email>,ssh-ed25519,<email>,rsa-sha2-256,<email>,rsa-sha2-512,<email>,ssh-rsa,<email> -oPubkeyAcceptedKeyTypes=ecdsa-sha2-nistp256,<email>,ecdsa-sha2-nistp384,<email>,ecdsa-sha2-nistp521,<email>,ssh-ed25519,<email>,rsa-sha2-256,<email>,rsa-sha2-512,<email>,ssh-rsa,<email> -oCASignatureAlgorithms=ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,ssh-ed25519,rsa-sha2-256,rsa-sha2-512,ssh-rsa
+root         630  0.0  0.0 219688  1584 tty1     Ss+  Jun09   0:00 /sbin/agetty -o -p -- \u --noclear tty1 linux
+polkitd      820  0.0  1.0 1611356 19120 ?       Ssl  Jun09   3:11 /usr/lib/polkit-1/polkitd --no-debug
+root         885  0.0  0.6 291524 12004 ?        Ssl  Jun09  17:17 /usr/sbin/rsyslogd -n
+root        5281  0.0  0.1 235708  3248 ?        Ss   Jun09   0:27 /usr/sbin/crond -n
+root        7490  0.0  2.9 673068 53696 ?        Ssl  Jun09   0:01 /usr/libexec/platform-python -s /usr/sbin/firewalld --nofork --nopid
+mita       24459  2.1 10.9 1902644 199584 ?      S<sl Jun09 2709:36 /usr/bin/mita run
+hysteria   25195  0.1  2.5 1348196 46428 ?       Ssl  Jun09 185:41 /usr/local/bin/hysteria server --config /etc/hysteria/config.yaml
+root      131981  0.0  0.0      0     0 ?        I    Jun14   0:41 [kworker/u2:2-events_unbound]
+root     1608016  0.0  0.0      0     0 ?        I    09:40   0:03 [kworker/0:4-events]
+root     1610084  0.0  0.0      0     0 ?        I    10:23   0:01 [kworker/0:0-events]
+root     1610881  0.0  0.0      0     0 ?        I    10:41   0:00 [kworker/0:2-cgroup_destroy]
+root     1611090  0.0  0.0      0     0 ?        I    10:41   0:00 [kworker/0:3-cgroup_destroy]
+root     1611416  0.0  0.0      0     0 ?        I    10:44   0:00 [kworker/0:5-cgroup_pidlist_destroy]
+root     1612584  0.0  0.5 126564  9244 ?        Ss   10:49   0:00 sshd: unknown [priv]
+sshd     1612585  0.0  0.1  76732  2960 ?        S    10:49   0:00 sshd: unknown [net]
+root     1612591  0.0  0.0      0     0 ?        R    10:49   0:00 [kworker/0:1-events_power_efficient]
+root     1612604  0.0  0.4 121388  8420 ?        Ss   10:49   0:00 sshd: root [priv]
+sshd     1612605  0.0  0.1  76732  2940 ?        S    10:49   0:00 sshd: root [net]
+
+########## docker-version ##########
+
+########## docker-ps ##########
+
+########## docker-images ##########
+
+########## systemd-running ##########
+auditd.service           loaded active running Security Auditing Service            
+chronyd.service          loaded active running NTP client/server                    
+crond.service            loaded active running Command Scheduler                    
+dbus.service             loaded active running D-Bus System Message Bus             
+firewalld.service        loaded active running firewalld - dynamic firewall daemon  
+<email>       loaded active running Getty on tty1                        
+hysteria-server.service  loaded active running Hysteria Server Service (config.yaml)
+mita.service             loaded active running Mieru proxy server                   
+NetworkManager.service   loaded active running Network Manager                      
+polkit.service           loaded active running Authorization Manager                
+qemu-guest-agent.service loaded active running QEMU Guest Agent                     
+rsyslog.service          loaded active running System Logging Service               
+sshd.service             loaded active running OpenSSH server daemon                
+systemd-journald.service loaded active running Journal Service                      
+systemd-logind.service   loaded active running Login Service                        
+systemd-udevd.service    loaded active running udev Kernel Device Manager           
+tuned.service            loaded active running Dynamic System Tuning Daemon         
+<email>           loaded active running User Manager for UID 0               
+
+########## systemd-enabled ##########
+auditd.service                             enabled
+autovt@.service                            enabled
+chronyd.service                            enabled
+crond.service                              enabled
+dbus-org.fedoraproject.FirewallD1.service  enabled
+dbus-org.freedesktop.nm-dispatcher.service enabled
+dbus-org.freedesktop.timedate1.service     enabled
+firewalld.service                          enabled
+getty@.service                             enabled
+hysteria-server.service                    enabled
+import-state.service                       enabled
+irqbalance.service                         enabled
+kdump.service                              enabled
+loadmodules.service                        enabled
+microcode.service                          enabled
+mita.service                               enabled
+NetworkManager-dispatcher.service          enabled
+NetworkManager-wait-online.service         enabled
+NetworkManager.service                     enabled
+nis-domainname.service                     enabled
+qemu-guest-agent.service                   enabled
+rsyslog.service                            enabled
+selinux-autorelabel-mark.service           enabled
+sshd.service                               enabled
+sssd.service                               enabled
+syslog.service                             enabled
+systemd-pstore.service                     enabled
+timedatex.service                          enabled
+tuned.service                              enabled
+sssd-kcm.socket                            enabled
+ctrl-alt-del.target                        enabled
+reboot.target                              enabled
+remote-fs.target                           enabled
+runlevel6.target                           enabled
+dnf-makecache.timer                        enabled
+unbound-anchor.timer                       enabled
+
+########## systemd-failed ##########
+
+########## toplevel-dirs ##########
+/:
+total 72
+dr-xr-xr-x. 18 root root  4096 Jun  9 14:20 .
+dr-xr-xr-x. 18 root root  4096 Jun  9 14:20 ..
+-rw-r--r--   1 root root     0 Jun  9 14:20 .autorelabel
+-rw-------.  1 root root   533 May  7 12:55 .viminfo
+lrwxrwxrwx.  1 root root     7 Oct  9  2021 bin -> usr/bin
+dr-xr-xr-x.  5 root root  4096 Jun  9 14:36 boot
+drwxr-xr-x  19 root root  2920 Jun  9 14:20 dev
+drwxr-xr-x. 83 root root  4096 Jun  9 17:21 etc
+drwxr-xr-x.  2 root root  4096 Oct  9  2021 home
+lrwxrwxrwx.  1 root root     7 Oct  9  2021 lib -> usr/lib
+lrwxrwxrwx.  1 root root     9 Oct  9  2021 lib64 -> usr/lib64
+drwx------.  2 root root 16384 Dec 21  2023 lost+found
+drwxr-xr-x.  2 root root  4096 Oct  9  2021 media
+drwxr-xr-x.  2 root root  4096 Oct  9  2021 mnt
+drwxr-xr-x.  2 root root  4096 Oct  9  2021 opt
+dr-xr-xr-x  98 root root     0 Jun  9 14:19 proc
+dr-xr-x---.  3 root root  4096 Sep  6 09:39 root
+drwxr-xr-x  27 root root   740 Jun  9 15:03 run
+lrwxrwxrwx.  1 root root     8 Oct  9  2021 sbin -> usr/sbin
+drwxr-xr-x.  2 root root  4096 Oct  9  2021 srv
+dr-xr-xr-x  13 root root     0 Jun  9 14:19 sys
+drwxrwxrwt.  5 root root  4096 Sep  6 10:50 tmp
+drwxr-xr-x. 12 root root  4096 Dec 21  2023 usr
+drwxr-xr-x. 20 root root  4096 Dec 21  2023 var
+
+/home:
+total 8
+drwxr-xr-x.  2 root root 4096 Oct  9  2021 .
+dr-xr-xr-x. 18 root root 4096 Jun  9 14:20 ..
+
+/opt:
+total 8
+drwxr-xr-x.  2 root root 4096 Oct  9  2021 .
+dr-xr-xr-x. 18 root root 4096 Jun  9 14:20 ..
+
+/root:
+total 4832
+dr-xr-x---.  3 root root    4096 Sep  6 09:39 .
+dr-xr-xr-x. 18 root root    4096 Jun  9 14:20 ..
+-rw-------   1 root root     878 Jun  9 15:07 .bash_history
+-rw-r--r--.  1 root root      18 Aug 12  2018 .bash_logout
+-rw-r--r--.  1 root root     176 Aug 12  2018 .bash_profile
+-rw-r--r--.  1 root root     176 Aug 12  2018 .bashrc
+-rw-r--r--.  1 root root     100 Aug 12  2018 .cshrc
+drwx------   2 root root    4096 Sep  6 09:39 .ssh
+-rw-r--r--.  1 root root     129 Aug 12  2018 .tcshrc
+-rw-------   1 root root     532 Jun  9 14:36 .viminfo
+-rwxr-xr-x   1 root root    2611 Jun  9 15:04 enable_tcp_bbr.py
+-rw-r--r--   1 root root 4898228 Jun  9 15:03 mita-3.33.0-1.x86_64.rpm
+-rw-r--r--   1 root root       9 Jun  9 14:38 mita_3.32.0_amd64.rpm
+
+/srv:
+total 8
+drwxr-xr-x.  2 root root 4096 Oct  9  2021 .
+dr-xr-xr-x. 18 root root 4096 Jun  9 14:20 ..
+
+########## sizes ##########
+4.0K	/root/enable_tcp_bbr.py
+4.7M	/root/mita-3.33.0-1.x86_64.rpm
+4.0K	/root/mita_3.32.0_amd64.rpm
+
+########## firewall ##########
+table ip filter {
+	chain INPUT {
+		type filter hook input priority filter; policy accept;
+	}
+
+	chain FORWARD {
+		type filter hook forward priority filter; policy accept;
+	}
+
+	chain OUTPUT {
+		type filter hook output priority filter; policy accept;
+	}
+}
+table ip6 filter {
+	chain INPUT {
+		type filter hook input priority filter; policy accept;
+	}
+
+	chain FORWARD {
+		type filter hook forward priority filter; policy accept;
+	}
+
+	chain OUTPUT {
+		type filter hook output priority filter; policy accept;
+	}
+}
+table bridge filter {
+	chain INPUT {
+		type filter hook input priority filter; policy accept;
+	}
+
+	chain FORWARD {
+		type filter hook forward priority filter; policy accept;
+	}
+
+	chain OUTPUT {
+		type filter hook output priority filter; policy accept;
+	}
+}
+table ip security {
+	chain INPUT {
+		type filter hook input priority 150; policy accept;
+	}
+
+	chain FORWARD {
+		type filter hook forward priority 150; policy accept;
+	}
+
+	chain OUTPUT {
+		type filter hook output priority 150; policy accept;
+	}
+}
+table ip raw {
+	chain PREROUTING {
+		type filter hook prerouting priority raw; policy accept;
+	}
+
+	chain OUTPUT {
+		type filter hook output priority raw; policy accept;
+	}
+}
+table ip mangle {
+	chain PREROUTING {
+		type filter hook prerouting priority mangle; policy accept;
+	}
+
+	chain INPUT {
+		type filter hook input priority mangle; policy accept;
+	}
+
+	chain FORWARD {
+		type filter hook forward priority mangle; policy accept;
+	}
+
+	chain OUTPUT {
+		type route hook output priority mangle; policy accept;
+	}
+
+	chain POSTROUTING {
+		type filter hook postrouting priority mangle; policy accept;
+	}
+}
+table ip nat {
+	chain PREROUTING {
+		type nat hook prerouting priority dstnat; policy accept;
+	}
+
+	chain INPUT {
+		type nat hook input priority 100; policy accept;
+	}
+
+	chain POSTROUTING {
+		type nat hook postrouting priority srcnat; policy accept;
+	}
+
+	chain OUTPUT {
+		type nat hook output priority -100; policy accept;
+	}
+}
+table ip6 security {
+	chain INPUT {
+		type filter hook input priority 150; policy accept;
+	}
+
+	chain FORWARD {
+		type filter hook forward priority 150; policy accept;
+	}
+
+	chain OUTPUT {
+		type filter hook output priority 150; policy accept;
+	}
+}
+table ip6 raw {
+	chain PREROUTING {
+		type filter hook prerouting priority raw; policy accept;
+	}
+
+	chain OUTPUT {
+		type filter hook output priority raw; policy accept;
+	}
+}
+table ip6 mangle {
+	chain PREROUTING {
+		type filter hook prerouting priority mangle; policy accept;
+	}
+
+	chain INPUT {
+		type filter hook input priority mangle; policy accept;
+	}
+
+	chain FORWARD {
+		type filter hook forward priority mangle; policy accept;
+	}
+
+	chain OUTPUT {
+		type route hook output priority mangle; policy accept;
+	}
+
+	chain POSTROUTING {
+		type filter hook postrouting priority mangle; policy accept;
+	}
+}
+table ip6 nat {
+	chain PREROUTING {
+		type nat hook prerouting priority dstnat; policy accept;
+	}
+
+	chain INPUT {
+		type nat hook input priority 100; policy accept;
+	}
+
+	chain POSTROUTING {
+		type nat hook postrouting priority srcnat; policy accept;
+	}
+
+	chain OUTPUT {
+		type nat hook output priority -100; policy accept;
+	}
+}
+table bridge nat {
+	chain PREROUTING {
+		type filter hook prerouting priority dstnat; policy accept;
+	}
+
+	chain OUTPUT {
+		type filter hook output priority out; policy accept;
+	}
+
+	chain POSTROUTING {
+		type filter hook postrouting priority srcnat; policy accept;
+	}
+}
+table inet firewalld {
+	chain mangle_PREROUTING {
+		type filter hook prerouting priority mangle + 10; policy accept;
+		jump mangle_PREROUTING_POLICIES_pre
+		jump mangle_PREROUTING_ZONES_SOURCE
+		jump mangle_PREROUTING_ZONES
+		jump mangle_PREROUTING_POLICIES_post
+	}
+
+	chain mangle_PREROUTING_POLICIES_pre {
+		jump mangle_PRE_policy_allow-host-ipv6
+	}
+
+	chain mangle_PREROUTING_ZONES_SOURCE {
+	}
+
+	chain mangle_PREROUTING_ZONES {
+		iifname "eth0" goto mangle_PRE_public
+		goto mangle_PRE_public
+	}
+
+	chain mangle_PREROUTING_POLICIES_post {
+	}
+
+	chain filter_PREROUTING {
+		type filter hook prerouting priority filter + 10; policy accept;
+		icmpv6 type { nd-router-advert, nd-neighbor-solicit } accept
+		meta nfproto ipv6 fib saddr . mark . iif oif missing drop
+	}
+
+	chain filter_INPUT {
+		type filter hook input priority filter + 10; policy accept;
+		ct state { established, related } accept
+		ct status dnat accept
+		iifname "lo" accept
+		jump filter_INPUT_POLICIES_pre
+		jump filter_INPUT_ZONES_SOURCE
+		jump filter_INPUT_ZONES
+		jump filter_INPUT_POLICIES_post
+		ct state invalid drop
+		reject with icmpx admin-prohibited
+	}
+
+	chain filter_FORWARD {
+		type filter hook forward priority filter + 10; policy accept;
+		ct state { established, related } accept
+		ct status dnat accept
+		iifname "lo" accept
+		ip6 daddr { ::/96, ::ffff:0.0.0.0/96, 2002::/24, 2002:a00::/24, 2002:7f00::/24, 2002:a9fe::/32, 2002:ac10::/28, 2002:c0a8::/32, 2002:e000::/19 } reject with icmpv6 addr-unreachable
+		jump filter_FORWARD_POLICIES_pre
+		jump filter_FORWARD_IN_ZONES_SOURCE
+		jump filter_FORWARD_IN_ZONES
+		jump filter_FORWARD_OUT_ZONES_SOURCE
+		jump filter_FORWARD_OUT_ZONES
+		jump filter_FORWARD_POLICIES_post
+		ct state invalid drop
+		reject with icmpx admin-prohibited
+	}
+
+	chain filter_OUTPUT {
+		type filter hook output priority filter + 10; policy accept;
+		ct state { established, related } accept
+		oifname "lo" accept
+		ip6 daddr { ::/96, ::ffff:0.0.0.0/96, 2002::/24, 2002:a00::/24, 2002:7f00::/24, 2002:a9fe::/32, 2002:ac10::/28, 2002:c0a8::/32, 2002:e000::/19 } reject with icmpv6 addr-unreachable
+		jump filter_OUTPUT_POLICIES_pre
+		jump filter_OUTPUT_POLICIES_post
+	}
+
+	chain filter_INPUT_POLICIES_pre {
+		jump filter_IN_policy_allow-host-ipv6
+	}
+
+	chain filter_INPUT_ZONES_SOURCE {
+	}
+
+	chain filter_INPUT_ZONES {
+		iifname "eth0" goto filter_IN_public
+		goto filter_IN_public
+	}
+
+	chain filter_INPUT_POLICIES_post {
+	}
+
+	chain filter_FORWARD_POLICIES_pre {
+	}
+
+	chain filter_FORWARD_IN_ZONES_SOURCE {
+	}
+
+	chain filter_FORWARD_IN_ZONES {
+		iifname "eth0" goto filter_FWDI_public
+		goto filter_FWDI_public
+	}
+
+	chain filter_FORWARD_OUT_ZONES_SOURCE {
+	}
+
+	chain filter_FORWARD_OUT_ZONES {
+		oifname "eth0" goto filter_FWDO_public
+		goto filter_FWDO_public
+	}
+
+	chain filter_FORWARD_POLICIES_post {
+	}
+
+	chain filter_OUTPUT_POLICIES_pre {
+	}
+
+	chain filter_OUTPUT_POLICIES_post {
+	}
+
+	chain filter_IN_public {
+		jump filter_IN_public_pre
+		jump filter_IN_public_log
+		jump filter_IN_public_deny
+		jump filter_IN_public_allow
+		jump filter_IN_public_post
+		meta l4proto { icmp, ipv6-icmp } accept
+	}
+
+	chain filter_IN_public_pre {
+	}
+
+	chain filter_IN_public_log {
+	}
+
+	chain filter_IN_public_deny {
+	}
+
+########## ufw ##########
+
+########## cron ##########
+total 12
+drwxr-xr-x.  2 root root 4096 Apr  6  2024 .
+drwxr-xr-x. 83 root root 4096 Jun  9 17:21 ..
+-rw-r--r--.  1 root root  128 Apr  6  2024 0hourly
+
+########## binaries ##########
+-- hysteria -> /usr/local/bin/hysteria
+
+░█░█░█░█░█▀▀░▀█▀░█▀▀░█▀▄░▀█▀░█▀█░░░▀▀▄
+░█▀█░░█░░▀▀█░░█░░█▀▀░█▀▄░░█░░█▀█░░░▄▀░
+░▀░▀░░▀░░▀▀▀░░▀░░▀▀▀░▀░▀░▀▀▀░▀░▀░░░▀▀▀
+
+-- mita -> /usr/bin/mita
+3.33.0
+
+########## compose-files ##########
+
+########## config-candidates ##########
+/etc/systemd/system/hysteria-server.service
+/etc/systemd/system/hysteria-server@.service
+/etc/systemd/system/<domain-6>/hysteria-server.service
+/etc/systemd/system/<domain-6>/mita.service
+/etc/mita
+/etc/hysteria
+/root/mita-3.33.0-1.x86_64.rpm
+/root/mita_3.32.0_amd64.rpm
+
+########## git-repos ##########
+

@@ -1,0 +1,352 @@
+===== systemctl cat mita.service =====
+# /usr/lib/systemd/system/mita.service
+[Unit]
+Description=Mieru proxy server
+After=network-online.target network.service networking.service NetworkManager.service systemd-networkd.service
+Wants=network-online.target
+StartLimitBurst=5
+<redacted-token>
+
+[Service]
+Type=exec
+User=mita
+Group=mita
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+Environment="MITA_LOG_NO_TIMESTAMP=true"
+ExecStartPre=+/usr/bin/mkdir -p /var/run/mita
+ExecStartPre=+/usr/bin/chown -R mita:mita /var/run/mita
+ExecStartPre=+/usr/bin/chmod 775 /var/run/mita
+ExecStart=/usr/bin/mita run
+Nice=-10
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
+################################################################################
+# Developer note: sync this file with <redacted-token>.service
+################################################################################
+===== systemctl status mita.service =====
+● mita.service - Mieru proxy server
+   Loaded: loaded (/usr/lib/systemd/system/mita.service; enabled; vendor preset: disabled)
+   Active: active (running) since Tue 2026-06-09 15:03:23 UTC; 2 months 27 days ago
+ Main PID: 24459 (mita)
+    Tasks: 5 (limit: 11165)
+   Memory: 200.7M
+   CGroup: /<domain-7>/mita.service
+           └─24459 /usr/bin/mita run
+
+Sep 06 10:34:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 10:44:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 10:44:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 10:44:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 10:44:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 10:44:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 10:44:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 10:44:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 10:44:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 10:44:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+===== journalctl -u mita.service -n 300 =====
+-- Logs begin at Sat 2026-09-05 02:53:24 UTC, end at Sun 2026-09-06 10:50:02 UTC. --
+Sep 06 05:14:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437020
+Sep 06 05:14:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22194 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 05:14:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 05:24:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 05:24:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770813
+Sep 06 05:24:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 05:24:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 05:24:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 05:24:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 05:24:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437020
+Sep 06 05:24:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22194 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 05:24:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 05:34:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 05:34:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770813
+Sep 06 05:34:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 05:34:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 05:34:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 05:34:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 05:34:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437020
+Sep 06 05:34:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22194 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 05:34:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 05:44:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 05:44:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770813
+Sep 06 05:44:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 05:44:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 05:44:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 05:44:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 05:44:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437020
+Sep 06 05:44:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22194 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 05:44:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 05:54:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 05:54:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770813
+Sep 06 05:54:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 05:54:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 05:54:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 05:54:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 05:54:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437020
+Sep 06 05:54:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22195 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 05:54:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 06:04:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 06:04:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770813
+Sep 06 06:04:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 06:04:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 06:04:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 06:04:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 06:04:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437020
+Sep 06 06:04:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22195 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 06:04:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 06:14:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 06:14:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770813
+Sep 06 06:14:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 06:14:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 06:14:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 06:14:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 06:14:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437020
+Sep 06 06:14:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22195 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 06:14:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 06:24:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 06:24:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770813
+Sep 06 06:24:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 06:24:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 06:24:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 06:24:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 06:24:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437020
+Sep 06 06:24:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22195 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 06:24:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 06:34:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 06:34:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770813
+Sep 06 06:34:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 06:34:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 06:34:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 06:34:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 06:34:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437020
+Sep 06 06:34:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22195 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 06:34:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 06:44:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 06:44:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770813
+Sep 06 06:44:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 06:44:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 06:44:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 06:44:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 06:44:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437020
+Sep 06 06:44:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22195 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 06:44:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 06:54:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 06:54:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770813
+Sep 06 06:54:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 06:54:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 06:54:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 06:54:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 06:54:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437020
+Sep 06 06:54:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22195 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 06:54:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 07:04:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 07:04:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 07:04:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 07:04:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 07:04:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 07:04:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 07:04:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 07:04:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 07:04:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 07:14:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 07:14:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 07:14:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 07:14:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 07:14:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 07:14:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 07:14:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 07:14:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 07:14:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 07:24:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 07:24:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 07:24:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 07:24:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 07:24:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 07:24:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 07:24:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 07:24:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 07:24:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 07:34:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 07:34:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 07:34:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 07:34:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 07:34:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 07:34:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 07:34:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 07:34:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 07:34:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 07:44:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 07:44:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 07:44:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 07:44:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 07:44:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 07:44:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 07:44:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 07:44:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 07:44:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 07:54:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 07:54:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 07:54:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 07:54:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 07:54:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 07:54:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 07:54:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 07:54:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 07:54:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 08:04:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 08:04:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 08:04:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 08:04:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 08:04:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 08:04:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 08:04:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 08:04:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 08:04:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 08:14:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 08:14:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 08:14:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 08:14:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 08:14:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 08:14:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 08:14:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 08:14:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 08:14:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 08:24:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 08:24:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 08:24:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 08:24:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 08:24:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 08:24:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 08:24:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 08:24:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 08:24:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 08:34:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 08:34:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 08:34:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 08:34:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 08:34:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 08:34:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 08:34:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 08:34:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 08:34:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 08:44:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 08:44:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 08:44:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 08:44:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 08:44:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 08:44:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 08:44:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 08:44:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 08:44:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 08:54:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 08:54:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 08:54:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 08:54:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 08:54:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 08:54:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 08:54:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 08:54:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 08:54:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 09:04:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 09:04:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 09:04:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 09:04:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 09:04:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 09:04:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 09:04:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 09:04:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 09:04:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 09:14:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 09:14:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 09:14:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 09:14:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 09:14:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 09:14:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 09:14:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 09:14:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 09:14:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 09:24:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 09:24:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 09:24:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 09:24:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 09:24:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 09:24:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 09:24:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 09:24:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 09:24:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 09:34:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 09:34:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 09:34:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 09:34:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 09:34:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 09:34:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 09:34:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 09:34:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 09:34:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 09:44:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 09:44:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 09:44:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 09:44:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 09:44:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 09:44:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 09:44:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 09:44:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 09:44:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 09:54:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 09:54:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 09:54:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 09:54:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 09:54:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 09:54:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 09:54:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 09:54:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 09:54:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 10:04:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 10:04:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 10:04:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 10:04:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 10:04:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 10:04:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 10:04:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 10:04:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 10:04:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 10:14:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 10:14:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 10:14:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 10:14:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 10:14:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 10:14:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 10:14:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 10:14:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 10:14:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 10:24:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 10:24:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 10:24:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 10:24:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 10:24:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 10:24:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 10:24:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 10:24:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 10:24:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 10:34:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 10:34:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 10:34:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 10:34:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 10:34:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 10:34:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 10:34:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 10:34:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 10:34:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+Sep 06 10:44:24 <domain-1> mita[24459]: INFO [metrics]
+Sep 06 10:44:24 <domain-1> mita[24459]: INFO [metrics - cipher - server] DirectDecrypt=33790674 FailedDirectDecrypt=0 <redacted-token> <redacted-token> HintMatchDecrypt=763832 IterateDecrypt=770814
+Sep 06 10:44:24 <domain-1> mita[24459]: INFO [metrics - connections] ActiveOpens=0 CurrEstablished=6 MaxConn=610 PassiveOpens=1282800
+Sep 06 10:44:24 <domain-1> mita[24459]: INFO [metrics - replay] KnownSession=0 NewSession=2223 NewSessionDecrypted=0
+Sep 06 10:44:24 <domain-1> mita[24459]: INFO [metrics - socks5] <redacted-token> DNSResolveErrors=7740 HandshakeErrors=394 <redacted-token> <redacted-token> RejectByRules=0 UDPAssociateErrors=60 <redacted-token>
+Sep 06 10:44:24 <domain-1> mita[24459]: INFO [metrics - socks5 UDP associate] DownloadBytes=1300038 DownloadPackets=1280 UploadBytes=372938 UploadPackets=639
+Sep 06 10:44:24 <domain-1> mita[24459]: INFO [metrics - traffic] <redacted-token> <redacted-token> UploadBytes=45297437092
+Sep 06 10:44:24 <domain-1> mita[24459]: INFO [metrics - underlay] ActiveOpens=0 CurrEstablished=11 MaxConn=33 PassiveOpens=22196 UnderlayMalformedUDP=5 UnsolicitedUDP=0
+Sep 06 10:44:24 <domain-1> mita[24459]: INFO [metrics - user - myuser] <redacted-token> UploadBytes=27428284677
+

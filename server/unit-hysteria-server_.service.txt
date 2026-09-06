@@ -1,0 +1,25 @@
+===== systemctl cat hysteria-server@.service =====
+# /etc/systemd/system/hysteria-server@.service
+[Unit]
+Description=Hysteria Server Service (%i.yaml)
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/hysteria server --config /etc/hysteria/%i.yaml
+WorkingDirectory=~
+User=hysteria
+Group=hysteria
+Environment=HYSTERIA_LOG_LEVEL=info
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_RAW
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_RAW
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
+===== systemctl status hysteria-server@.service =====
+Failed to get properties: Unit name hysteria-server@.service is neither a valid invocation ID nor unit name.
+===== journalctl -u hysteria-server@.service -n 300 =====
+-- Logs begin at Sat 2026-09-05 02:53:24 UTC, end at Sun 2026-09-06 10:50:02 UTC. --
+-- No entries --
+

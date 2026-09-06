@@ -1,0 +1,6 @@
+Sanitiser report (mapping intentionally not included)
+files processed        : 16
+distinct hosts masked  : 50
+distinct IPv4 masked   : 66
+distinct IPv6 masked   : 1
+vpn host variants used : 2

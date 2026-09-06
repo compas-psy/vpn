@@ -1,0 +1,16 @@
+listen: :36712
+
+tls:
+  cert: /etc/hysteria/<domain-48>
+  key: /etc/hysteria/<domain-49>
+
+auth:
+  <redacted> password
+  password: <redacted>
+
+masquerade:
+  type: proxy
+  proxy:
+    url: https://<domain-50>/
+    rewriteHost: true
+
