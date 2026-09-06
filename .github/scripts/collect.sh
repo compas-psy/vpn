@@ -1,11 +1,19 @@
 #!/usr/bin/env bash
 # Read-only inventory of the VPN server.
 #
-# The archive is written to STDOUT as base64 between -----BEGIN VPNINFO-----
-# and -----END VPNINFO----- markers. The login shell shares this stdout and
-# may prepend a banner, so the caller slices out the marked block rather than
-# trusting the stream to be clean. Diagnostics go to STDERR.
+# STDOUT carries a base64 blob between -----BEGIN VPNINFO----- and
+# -----END VPNINFO----- markers; inside it, files are concatenated, each one
+# preceded by "@@@@@ VPNFILE <relative path> @@@@@". No tar, no gzip: this host
+# has neither. The login shell shares stdout, hence the markers.
+# Diagnostics go to STDERR.
 set -uo pipefail
+
+{
+  echo "TOOLS:"
+  for b in base64 tar gzip xz python3 python find docker systemctl ss nft; do
+    printf '  %-10s %s\n' "$b" "$(command -v "$b" 2>/dev/null || echo MISSING)"
+  done
+} >&2
 
 OUT=$(mktemp -d /tmp/vpninfo.XXXXXX) || OUT=/tmp/vpninfo.d
 rm -rf "${OUT:?}"/* 2>/dev/null
@@ -34,7 +42,7 @@ sect() { echo; echo "########## $* ##########"; }
   sect ufw;              ufw status verbose 2>/dev/null
   sect cron;             crontab -l 2>/dev/null; ls -la /etc/cron.d 2>/dev/null
   sect binaries
-  for b in hysteria hysteria2 mieru mita sing-box xray v2ray trojan-go naive caddy nginx tar gzip; do
+  for b in hysteria hysteria2 mieru mita sing-box xray v2ray trojan-go naive caddy nginx; do
     command -v "$b" >/dev/null 2>&1 && { echo "-- $b -> $(command -v "$b")"; "$b" version 2>&1 | head -5; }
   done
   sect compose-files
@@ -100,12 +108,14 @@ done
 echo "COLLECT_OK files=$(find "$OUT" -type f | wc -l)" >&2
 
 echo "-----BEGIN VPNINFO-----"
-if command -v gzip >/dev/null 2>&1; then
-  tar czf - -C "$OUT" . 2>/dev/null | base64
-else
-  echo "COLLECT_NOTE gzip missing, sending an uncompressed tar" >&2
-  tar cf - -C "$OUT" . 2>/dev/null | base64
-fi
+(
+  cd "$OUT" || exit 1
+  find . -type f | sed 's|^\./||' | sort | while IFS= read -r rel; do
+    printf '@@@@@ VPNFILE %s @@@@@\n' "$rel"
+    cat "$rel" 2>/dev/null
+    printf '\n'
+  done
+) | base64
 echo "-----END VPNINFO-----"
 
 rm -rf "${OUT:?}"
