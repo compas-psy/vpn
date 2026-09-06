@@ -3,8 +3,11 @@ name: vpn-inventory
 # Pulls a read-only inventory of the VPN server over SSH, pseudonymises every
 # host, address, key and password in it, and commits the result to server/.
 #
-# THIS REPOSITORY IS PUBLIC. Nothing may be committed or printed before it has
-# been through .github/scripts/sanitize.py.
+# THIS REPOSITORY IS PUBLIC.
+#   * nothing may be committed before it has been through sanitize.py
+#   * never run ssh with -v: verbose output prints the resolved address, which
+#     secret masking does not catch (the masked secret is "user@host", not the
+#     bare address)
 
 on:
   push:
@@ -12,6 +15,7 @@ on:
       - '.github/workflows/vpn-inventory.yml'
       - '.github/scripts/collect.sh'
       - '.github/scripts/sanitize.py'
+      - '.github/scripts/normalize_key.py'
   workflow_dispatch:
 
 permissions:
@@ -35,7 +39,7 @@ jobs:
           set -euo pipefail
           mkdir -p ~/.ssh && chmod 700 ~/.ssh
 
-          printf '%s\n' "$VPN_SSH_KEY" | tr -d '\r' > ~/.ssh/vpn_key
+          printf '%s\n' "$VPN_SSH_KEY" > ~/.ssh/vpn_key
 
           # A secret stored as base64 is still a usable key - unwrap it.
           if ! grep -q -- '-----BEGIN' ~/.ssh/vpn_key; then
@@ -48,50 +52,18 @@ jobs:
             fi
           fi
 
-          # A key pasted as one long line parses only after the body is reflowed.
-          python3 - <<'PY'
-          import os, re
-          p = os.path.expanduser("~/.ssh/vpn_key")
-          raw = open(p).read().strip()
-          if raw.count("\n") < 3:
-              m = re.match(r"-----BEGIN ([A-Z0-9 ]+)-----(.*?)-----END \1-----", raw, re.S)
-              if m:
-                  kind = m.group(1)
-                  body = re.sub(r"\s+", "", m.group(2))
-                  wrapped = "\n".join(body[i:i + 70] for i in range(0, len(body), 70))
-                  open(p, "w").write(f"-----BEGIN {kind}-----\n{wrapped}\n-----END {kind}-----\n")
-                  print("note: key was on a single line, reflowed it")
-          PY
-
-          # exactly one trailing newline
-          printf '%s\n' "$(cat ~/.ssh/vpn_key)" > ~/.ssh/vpn_key.tmp
-          mv ~/.ssh/vpn_key.tmp ~/.ssh/vpn_key
+          python3 .github/scripts/normalize_key.py ~/.ssh/vpn_key
           chmod 600 ~/.ssh/vpn_key
 
           printf '%s\n' "$VPN_KNOWN_HOSTS" | tr -d '\r' > ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
-
-          if grep -q 'BEGIN OPENSSH PRIVATE KEY' ~/.ssh/vpn_key; then
-            echo "key format: openssh"
-          elif grep -q 'BEGIN RSA PRIVATE KEY' ~/.ssh/vpn_key; then
-            echo "key format: pem/rsa"
-          elif grep -q 'BEGIN EC PRIVATE KEY' ~/.ssh/vpn_key; then
-            echo "key format: pem/ec"
-          elif grep -q 'BEGIN PRIVATE KEY' ~/.ssh/vpn_key; then
-            echo "key format: pkcs8"
-          elif grep -q 'ssh-\(rsa\|ed25519\)' ~/.ssh/vpn_key; then
-            echo "key format: THIS IS A PUBLIC KEY, not a private one"
-          else
-            echo "key format: unrecognised"
-          fi
-          echo "key lines: $(wc -l < ~/.ssh/vpn_key)"
           echo "known_hosts entries: $(grep -c . ~/.ssh/known_hosts || true)"
 
-          if ssh-keygen -y -P '' -f ~/.ssh/vpn_key >/dev/null 2>&1; then
-            echo "key parses, no passphrase"
+          if ssh-keygen -y -P '' -f ~/.ssh/vpn_key > ~/.ssh/vpn_key.pub 2>/dev/null; then
+            echo "key parses, no passphrase; public half: $(awk '{print $1}' ~/.ssh/vpn_key.pub)"
+            ssh-keygen -lf ~/.ssh/vpn_key.pub | awk '{print "fingerprint:", $2}'
           else
-            echo "warning: ssh-keygen cannot read the key unattended"
-            echo "         (encrypted with a passphrase, or malformed)"
+            echo "warning: ssh-keygen still cannot read the key unattended"
           fi
 
       - name: Collect inventory
@@ -108,14 +80,9 @@ jobs:
             *@*) target="$raw" ;;
             *)   target="root@$raw" ;;
           esac
-          SSHOPTS="-i $HOME/.ssh/vpn_key -p $port -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=20 -o StrictHostKeyChecking=yes"
+          SSHOPTS="-i $HOME/.ssh/vpn_key -p $port -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=20 -o StrictHostKeyChecking=yes -o LogLevel=ERROR"
           # shellcheck disable=SC2086
-          if ! ssh $SSHOPTS "$target" 'echo connected' ; then
-            echo "----- ssh failed, verbose retry -----"
-            # shellcheck disable=SC2086
-            ssh -v $SSHOPTS "$target" 'echo connected' || true
-            exit 1
-          fi
+          ssh $SSHOPTS "$target" 'echo connected'
           # shellcheck disable=SC2086
           ssh $SSHOPTS "$target" 'bash -s' < .github/scripts/collect.sh
           # shellcheck disable=SC2086
