@@ -114,10 +114,14 @@ jobs:
           SSHOPTS="-i $HOME/.ssh/vpn_key -p $port -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=20 -o StrictHostKeyChecking=yes -o LogLevel=ERROR"
           # shellcheck disable=SC2086
           ssh $SSHOPTS "$target" 'echo connected'
-          # collect.sh writes the archive to stdout and its diagnostics to stderr
           # shellcheck disable=SC2086
-          ssh $SSHOPTS "$target" 'bash -s' < .github/scripts/collect.sh > /tmp/vpninfo.tar
+          ssh $SSHOPTS "$target" 'bash -s' < .github/scripts/collect.sh > /tmp/vpninfo.stream
+          # the login shell shares stdout, so take only the marked block
+          sed -n '/-----BEGIN VPNINFO-----/,/-----END VPNINFO-----/p' /tmp/vpninfo.stream \
+            | sed '1d;$d' | tr -d '\r\n' | base64 -d > /tmp/vpninfo.tar
+          rm -f /tmp/vpninfo.stream
           echo "archive bytes: $(wc -c < /tmp/vpninfo.tar)"
+          test -s /tmp/vpninfo.tar
 
       - name: Unpack and sanitise
         env:
