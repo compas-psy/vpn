@@ -4,7 +4,11 @@
 GitHub secrets routinely arrive with the newlines turned into a literal "\\n",
 with CRLF endings, or collapsed onto a single line - all of which OpenSSL
 rejects with the unhelpful "error in libcrypto". This rewrites the file into a
-canonical PEM and prints a description that contains no key material.
+canonical PEM.
+
+When the secret is not a private key at all, it says what it is instead. Every
+message here is written for a PUBLIC log: it reports shapes and lengths, never
+key material.
 
 Usage: normalize_key.py <key-path>
 """
@@ -22,10 +26,40 @@ with open(path, "r", errors="replace") as fh:
 raw = raw.replace("\\r\\n", "\n").replace("\\n", "\n").replace("\\r", "\n")
 raw = raw.replace("\r\n", "\n").replace("\r", "\n").strip()
 
-match = re.search(r"-----BEGIN ([A-Z0-9 ]+?)-----(.*?)-----END \1-----", raw, re.S)
+# a secret stored as base64 of the whole key
+if "-----BEGIN" not in raw:
+    compact = re.sub(r"\s+", "", raw)
+    if re.fullmatch(r"[A-Za-z0-9+/=]+", compact or "x"):
+        try:
+            candidate = base64.b64decode(
+                compact + "=" * ((-len(compact)) % 4), validate=True
+            ).decode("utf-8", "replace")
+            if "-----BEGIN" in candidate:
+                raw = candidate.strip()
+                print("key: secret was base64-wrapped, unwrapped it")
+        except Exception:  # noqa: BLE001 - just a probe
+            pass
+
+PEM = re.compile(r"-----BEGIN ([A-Z0-9 ]+?)-----(.*?)-----END \1-----", re.S)
+match = PEM.search(raw)
+
 if not match:
-    print("key: no PEM envelope found (not a private key, or truncated)")
-    sys.exit(0)
+    lines = raw.count("\n") + 1 if raw else 0
+    print(f"key: NOT a usable private key - {len(raw)} chars, {lines} lines")
+    if raw.startswith(("ssh-rsa", "ssh-ed25519", "ssh-dss", "ecdsa-sha2", "sk-ssh", "sk-ecdsa")):
+        kind = raw.split(None, 1)[0]
+        print(f"key: this is a PUBLIC key ({kind}) - VPN_SSH_KEY needs the PRIVATE half")
+    elif "PuTTY-User-Key-File" in raw:
+        print("key: this is a PuTTY .ppk - export it as OpenSSH before storing it")
+    elif "-----BEGIN" in raw:
+        print("key: has a BEGIN line but no matching END - the secret is truncated")
+    elif not raw:
+        print("key: the secret is empty")
+    elif re.fullmatch(r"[A-Za-z0-9+/=\s]+", raw):
+        print("key: bare base64 with no PEM header - headers were lost on paste")
+    else:
+        print("key: unrecognised format")
+    sys.exit(1)
 
 kind = match.group(1)
 body = match.group(2)
@@ -44,9 +78,8 @@ for line in body.strip().splitlines():
         body_lines.append(stripped)
 
 b64 = re.sub(r"[^A-Za-z0-9+/=]", "", "".join(body_lines))
-padding = (-len(b64)) % 4
 try:
-    decoded = base64.b64decode(b64 + "=" * padding, validate=True)
+    decoded = base64.b64decode(b64 + "=" * ((-len(b64)) % 4), validate=True)
 except Exception as exc:  # noqa: BLE001 - the message is the diagnosis
     print(f"key: {kind}, base64 body is corrupt ({exc})")
     sys.exit(1)
@@ -62,7 +95,6 @@ out.append(f"-----END {kind}-----")
 with open(path, "w") as fh:
     fh.write("\n".join(out) + "\n")
 
-encrypted = any(h.startswith(("Proc-Type", "DEK-Info")) for h in header_lines)
 print(f"key: {kind}, body {len(b64)} b64 chars -> {len(decoded)} bytes, rewritten canonically")
-if encrypted:
+if any(h.startswith(("Proc-Type", "DEK-Info")) for h in header_lines):
     print("key: PEM headers say it is passphrase-encrypted - unattended ssh cannot use it")
