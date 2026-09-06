@@ -22,6 +22,7 @@ on:
       - '.github/scripts/collect.sh'
       - '.github/scripts/sanitize.py'
       - '.github/scripts/normalize_key.py'
+      - '.github/scripts/unpack.py'
   workflow_dispatch:
 
 permissions:
@@ -118,10 +119,10 @@ jobs:
           ssh $SSHOPTS "$target" 'bash -s' < .github/scripts/collect.sh > /tmp/vpninfo.stream
           # the login shell shares stdout, so take only the marked block
           sed -n '/-----BEGIN VPNINFO-----/,/-----END VPNINFO-----/p' /tmp/vpninfo.stream \
-            | sed '1d;$d' | tr -d '\r\n' | base64 -d > /tmp/vpninfo.tar
+            | sed '1d;$d' | tr -d '\r\n' | base64 -d > /tmp/vpninfo.txt
           rm -f /tmp/vpninfo.stream
-          echo "archive bytes: $(wc -c < /tmp/vpninfo.tar)"
-          test -s /tmp/vpninfo.tar
+          echo "payload bytes: $(wc -c < /tmp/vpninfo.txt)"
+          test -s /tmp/vpninfo.txt
 
       - name: Unpack and sanitise
         env:
@@ -130,9 +131,8 @@ jobs:
           set -euo pipefail
           rm -rf server
           mkdir -p server
-          tar xzf /tmp/vpninfo.tar -C server 2>/dev/null \
-            || tar xf /tmp/vpninfo.tar -C server
-          rm -f /tmp/vpninfo.tar
+          python3 .github/scripts/unpack.py /tmp/vpninfo.txt server
+          rm -f /tmp/vpninfo.txt
           python3 .github/scripts/sanitize.py server
           echo "total files: $(find server -type f | wc -l)"
 
