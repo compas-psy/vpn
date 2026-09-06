@@ -1,0 +1,91 @@
+name: vpn-inventory
+
+# Pulls a read-only inventory of the VPN server over SSH, pseudonymises every
+# host, address, key and password in it, and commits the result to server/.
+#
+# THIS REPOSITORY IS PUBLIC. Nothing may be committed or printed before it has
+# been through .github/scripts/sanitize.py.
+
+on:
+  push:
+    paths:
+      - '.github/workflows/vpn-inventory.yml'
+      - '.github/scripts/collect.sh'
+      - '.github/scripts/sanitize.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: vpn-inventory
+  cancel-in-progress: false
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure SSH
+        env:
+          VPN_SSH_KEY: ${{ secrets.VPN_SSH_KEY }}
+          VPN_KNOWN_HOSTS: ${{ secrets.VPN_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$VPN_SSH_KEY" > ~/.ssh/vpn_key
+          chmod 600 ~/.ssh/vpn_key
+          printf '%s\n' "$VPN_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+          ssh-keygen -lf ~/.ssh/vpn_key >/dev/null 2>&1 \
+            && echo "ssh key loaded" \
+            || { echo "VPN_SSH_KEY is not a valid private key"; exit 1; }
+
+      - name: Collect inventory
+        env:
+          VPN_HOST: ${{ secrets.VPN_HOST }}
+        run: |
+          set -euo pipefail
+          raw="$VPN_HOST"
+          port=22
+          case "$raw" in
+            *:*) port="${raw##*:}"; raw="${raw%:*}" ;;
+          esac
+          case "$raw" in
+            *@*) target="$raw" ;;
+            *)   target="root@$raw" ;;
+          esac
+          SSHOPTS="-i $HOME/.ssh/vpn_key -p $port -o BatchMode=yes -o ConnectTimeout=20 -o StrictHostKeyChecking=yes"
+          # shellcheck disable=SC2086
+          ssh $SSHOPTS "$target" 'bash -s' < .github/scripts/collect.sh
+          # shellcheck disable=SC2086
+          ssh $SSHOPTS "$target" 'cat /tmp/vpninfo.tgz' > /tmp/vpninfo.tgz
+          # shellcheck disable=SC2086
+          ssh $SSHOPTS "$target" 'rm -rf /tmp/vpninfo.tgz /tmp/vpninfo.d' || true
+          echo "downloaded bytes: $(stat -c %s /tmp/vpninfo.tgz)"
+
+      - name: Unpack and sanitise
+        env:
+          VPN_HOST_RAW: ${{ secrets.VPN_HOST }}
+        run: |
+          set -euo pipefail
+          rm -rf server
+          mkdir -p server
+          tar xzf /tmp/vpninfo.tgz -C server
+          rm -f /tmp/vpninfo.tgz
+          python3 .github/scripts/sanitize.py server
+          echo "total files: $(find server -type f | wc -l)"
+
+      - name: Commit sanitised inventory
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A server
+          if git diff --cached --quiet; then
+            echo "no changes"
+            exit 0
+          fi
+          git commit -m "chore(server): refresh sanitised VPN server inventory"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
